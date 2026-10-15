@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="app-token" content="__APP_TOKEN__">
+  <title>HappyHorse Studio · 视频创作台</title>
+  <link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body>
+  <header><div class="brand"><span class="mark">H</span><div>HappyHorse <strong>Studio</strong><small>把想象，变成影像</small></div></div><div class="header-actions"><span class="local"><i></i> 本地创作台</span><button id="quit-app" class="text-button" title="关闭本地服务；云端任务继续运行">退出应用</button></div></header>
+  <main>
+    <section class="intro"><span class="eyebrow">YOUR NEXT SCENE</span><h1>每一个画面，从这里开始。</h1><p>文字、图片与视频，四种方式开启创作。</p></section>
+    <div class="workspace">
+      <aside class="card settings">
+        <div class="card-heading"><h2>连接设置</h2><span class="tag">MODEL STUDIO</span></div>
+        <label>API Key<input id="api-key" type="password" autocomplete="off" placeholder="sk-…"></label>
+        <p class="hint">仅在当前页面内存中使用，关闭后需重新填写。</p>
+        <label>接入方式<select id="billing"><option value="auto">自动识别 Key 类型</option><option value="tokenplan">TokenPlan 套餐</option><option value="payg">普通 API · 按量付费</option></select></label>
+        <p id="billing-help" class="hint"></p>
+        <label id="workspace-field">业务空间 ID<input id="workspace" autocomplete="off" placeholder="控制台中的 WorkspaceId"></label>
+        <label>模型地域<select id="region"><option value="cn-beijing">北京 · cn-beijing</option><option value="ap-southeast-1">新加坡 · ap-southeast-1</option><option value="us-east-1">弗吉尼亚 · us-east-1</option><option value="eu-central-1">法兰克福 · eu-central-1</option><option value="ap-northeast-1">东京 · ap-northeast-1</option></select></label>
+        <p id="region-help" class="hint">Key、模型与接口必须属于同一地域。</p>
+        <div class="divider"></div>
+        <label id="version-field">模型版本<select id="version"><option value="1.1">HappyHorse 1.1</option><option value="1.0">HappyHorse 1.0</option></select></label>
+        <label>分辨率<select id="resolution"><option value="720P">720P · 标准</option><option value="1080P">1080P · 高清</option><option value="480P">480P · 预览</option></select></label>
+        <label id="ratio-field">画面比例<select id="ratio"><option>16:9</option><option>9:16</option><option>1:1</option><option>4:3</option><option>3:4</option><option>4:5</option><option>5:4</option><option>9:21</option><option>21:9</option></select></label>
+        <label id="duration-field">视频时长 <span id="duration-value">5 秒</span><input id="duration" type="range" min="3" max="15" value="5"><span class="range-labels"><span>3 秒</span><span>15 秒</span></span></label>
+        <label id="audio-field" hidden>声音处理<select id="audio"><option value="auto">由模型自动控制</option><option value="origin">保留视频原声</option></select></label>
+        <label class="check"><input id="watermark" type="checkbox" checked> 添加 HappyHorse 水印</label>
+        <details><summary>更多选项</summary><label>随机种子<input id="seed" type="number" min="0" max="2147483647" step="1" placeholder="留空则随机"></label><p class="hint">固定种子有助于复现，不保证生成结果完全相同。</p></details>
+        <a id="docs-link" class="text-link" target="_blank" rel="noreferrer">查看当前模式文档 ↗</a>
+      </aside>
+      <section class="creation">
+        <div class="tabs" role="tablist" aria-label="创作模式"><button role="tab" aria-selected="true" data-mode="t2v">文生视频</button><button role="tab" aria-selected="false" data-mode="i2v">首帧图生视频</button><button role="tab" aria-selected="false" data-mode="r2v">参考生视频</button><button role="tab" aria-selected="false" data-mode="edit">视频编辑</button></div>
+        <div class="card composer">
+          <div class="card-heading"><h2 id="mode-title">描述你想看到的画面</h2><span class="step">01 / 创作</span></div>
+          <p id="mode-help" class="hint"></p>
+          <div id="video-field" hidden><label>待编辑视频的公网链接<input id="video-url" type="url" placeholder="https://…/video.mp4"></label><p class="hint">支持 MP4 / MOV，3～60 秒、≤100 MB。超过 15 秒时仅编辑前 15 秒。本地视频需先上传到 OSS 等公网存储。</p></div>
+          <div id="image-field" hidden>
+            <div class="asset-toolbar"><h3 id="image-title">参考图片</h3><label class="file-button">＋ 选择本地图片<input id="file-input" type="file" accept="image/jpeg,image/png,image/webp" multiple></label></div>
+            <div class="url-row"><input id="image-url" type="url" placeholder="或者粘贴图片公网链接"><button id="add-url" class="secondary" type="button">添加</button></div>
+            <div id="assets" class="assets"></div><p id="image-help" class="hint"></p>
+          </div>
+          <label class="prompt-label">提示词 <span id="prompt-count">0 字符</span><textarea id="prompt" rows="6" placeholder="例如：一只橘猫在阳光下的草地上追逐蝴蝶，镜头缓慢跟随，微风吹动草叶，写实风格，暖色调。"></textarea></label>
+          <div class="composer-footer"><button id="example" class="text-button" type="button">填入示例提示词</button><span id="billing-note" class="hint">生成请求按阿里云账户规则计费</span></div>
+          <button id="generate" class="primary" type="button">生成视频 <span>↗</span></button>
+          <div id="message" role="status" aria-live="polite"></div>
+        </div>
+        <div class="card result">
+          <div class="card-heading"><h2>视频与任务</h2><span id="status" class="tag">等待创作</span></div>
+          <div id="empty" class="empty"><span class="play-icon">▷</span><h3>你的下一段影像</h3><p>提交后自动每 15 秒查询，成功后预览并保存视频。</p></div>
+          <video id="preview" controls playsinline preload="metadata" hidden></video>
+          <div id="result-actions" hidden><a id="download" class="secondary" download>下载 MP4</a><a id="original" class="text-link" target="_blank" rel="noreferrer">云端视频链接 ↗</a><button id="retry-download" class="text-button" hidden>重试保存</button><p id="saved-path" class="hint"></p></div>
+          <div class="task-row"><input id="task-id" placeholder="任务 ID（也可粘贴已有任务 ID）" aria-label="任务 ID"><button id="query" class="secondary">继续查询</button><button id="stop" class="text-button" hidden>暂停查询</button></div>
+          <p class="hint">暂停查询不会取消云端任务。云端任务与视频链接有效期为 24 小时。</p>
+          <details id="response-details"><summary>查看接口响应</summary><pre id="response">尚未提交任务。</pre></details>
+        </div>
+        <div class="card history"><div class="card-heading"><h2>最近任务</h2><button id="clear-history" class="text-button">清空记录</button></div><p class="hint">只保存任务 ID、模式、地域和状态；重新打开后可恢复查询。</p><div id="history-list"></div></div>
+      </section>
+    </div>
+    <footer>HappyHorse Studio · 本地运行，素材仅在提交时发送到阿里云。</footer>
+  </main>
+</body></html>

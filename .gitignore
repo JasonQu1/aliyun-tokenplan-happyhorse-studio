@@ -1,0 +1,13 @@
+__pycache__/
+downloads/
+build/
+dist/
+*.spec
+.DS_Store
+._*
+.env
+.env.*
+*.log
+preview-custom.png
+preview-tokenplan.png
+web/background.png
